@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生信息管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-delete {
+            padding: 6px 12px;
+            background-color: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc2626;
+        }
+
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 6px;
+            padding: 12px 16px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        td {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>学生信息管理系统</h1>
+        <p>软件工程课程作业 - 学生信息管理</p>
+    </div>
+
+    <div class="container">
+        <!-- 左侧：添加学生表单 -->
+        <div class="card">
+            <div class="card-title">添加学生信息</div>
+            <form id="studentForm">
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" placeholder="请输入学生姓名" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentId">学号</label>
+                    <input type="text" id="studentId" placeholder="请输入学号" required>
+                </div>
+                <div class="form-group">
+                    <label for="major">专业</label>
+                    <input type="text" id="major" placeholder="请输入专业" required>
+                </div>
+                <button type="submit" class="btn">添加学生</button>
+            </form>
+        </div>
+
+        <!-- 右侧：学生列表 -->
+        <div class="card">
+            <div class="card-title">学生列表</div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">学生总数</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>学号</th>
+                        <th>专业</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="studentList">
+                </tbody>
+            </table>
+            <div class="empty-state" id="emptyState">暂无学生信息，请在左侧添加</div>
+        </div>
+    </div>
+
+    <script>
+        // 从 localStorage 读取学生数据
+        function getStudents() {
+            const students = localStorage.getItem('students');
+            return students ? JSON.parse(students) : [];
+        }
+
+        // 保存学生数据到 localStorage
+        function saveStudents(students) {
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        // 渲染学生列表
+        function renderStudents() {
+            const students = getStudents();
+            const listEl = document.getElementById('studentList');
+            const emptyEl = document.getElementById('emptyState');
+            const totalEl = document.getElementById('totalCount');
+
+            totalEl.textContent = students.length;
+
+            if (students.length === 0) {
+                emptyEl.style.display = 'block';
+                listEl.innerHTML = '';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            listEl.innerHTML = students.map((student, index) => `
+                <tr>
+                    <td>${student.name}</td>
+                    <td>${student.studentId}</td>
+                    <td>${student.major}</td>
+                    <td><button class="btn-delete" onclick="deleteStudent(${index})">删除</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // 添加学生
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const studentId = document.getElementById('studentId').value.trim();
+            const major = document.getElementById('major').value.trim();
+
+            if (!name || !studentId || !major) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const students = getStudents();
+            students.push({ name, studentId, major });
+            saveStudents(students);
+            
+            // 清空表单
+            document.getElementById('studentForm').reset();
+            
+            // 重新渲染
+            renderStudents();
+        });
+
+        // 删除学生
+        function deleteStudent(index) {
+            if (!confirm('确定要删除这条学生信息吗？')) {
+                return;
+            }
+            
+            const students = getStudents();
+            students.splice(index, 1);
+            saveStudents(students);
+            renderStudents();
+        }
+
+        // 页面加载时渲染
+        renderStudents();
+    </script>
+</body>
+</html>
